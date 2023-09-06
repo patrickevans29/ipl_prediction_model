@@ -29,3 +29,11 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     '''
     df = clean_data(df)
     pass # ADD CODE HERE
+
+def get_data(userinput: list) -> pd.DataFrame:
+    '''
+    Here is where the data is taken. This could be based on the user input
+    on Streamlit. The information could be taken from BigQuery once the user
+    asks for a prediction.
+    '''
+    pass # ADD CODE HERE
