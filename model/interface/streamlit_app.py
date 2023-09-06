@@ -7,7 +7,7 @@ def load_model():
     '''
     Load your trained model from ml-logic
     '''
-    pass
+    pass # ADD CODE HERE
 
 model = load_model()
 team_names = ['rajasthan royals', 'royal challengers bangalore',
