@@ -1,0 +1,29 @@
+FILL IN THE ENV FILE:
+
+  - # Model Target
+  MODEL_TARGET=local
+
+  - # Cloud Storage
+  BUCKET_NAME=taxifare_patrickevans29
+
+  - # GCP Project
+  GCP_PROJECT_WAGON=wagon-public-datasets (OR PATRICK's)
+
+  - # Your personal GCP project for this bootcamp
+  GCP_PROJECT=resonant-gizmo-393115
+  GCP_REGION=europe-west1
+
+  - # BigQuery
+  BQ_REGION=EU
+  BQ_DATASET=taxifare
+
+FUNCTIONS TO WRITE
+  ml_logic.data:
+    - def clean_data()
+    - def function_engineer()
+
+FUNCTIONS TO UPDATE
+  model.interface.main.py
+  - where X and y are created
+  - Update the query in def train()
+  -
