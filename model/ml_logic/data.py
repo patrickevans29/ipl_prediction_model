@@ -1,4 +1,7 @@
+import numpy as np
 import pandas as pd
+
+from model.ml_logic.feature_engineer import player_features_dataset
 
 '''
 This module is used for cleaning data that can be
@@ -28,7 +31,10 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     - team_2_avg_mvp --> average number of times that team_2 has MVP
     '''
     df = clean_data(df)
-    pass # ADD CODE HERE
+
+    player_dataset = player_features_dataset(df)
+
+    return player_dataset
 
 def get_data(userinput: list) -> pd.DataFrame:
     '''
