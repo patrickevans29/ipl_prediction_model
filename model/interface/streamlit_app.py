@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import requests
+
+'''
+# IPLPredictionModel front
+
+This front queries the Le Wagon IPL Prediction Model Team's model
+(https://....ADD THE API HERE....)
+'''
 
 @st.cache_data # This will tell streamlit to keep the model in cache
 def load_model():
@@ -51,7 +58,14 @@ venue = st.selectbox('Select Venue', venues)
 # Save the user input to put into the model
 user_input = pd.DataFrame({'team1': [home_team], 'team2': [away_team], 'venue': [venue]})
 
+# Write some code to get the other parameters needed for the model
+
+params = None # ADD CODE
+
+ipl_prediction_model_url = None # ADD CODE
+response = requests.get(ipl_prediction_model_url, params=params)
+prediction = response.json()
+
 # Call the make the prediction
 if st.button('Predict Winner'):
-    prediction = model.predict(user_input)
     st.write(f'Predicted Winner: {prediction}')
