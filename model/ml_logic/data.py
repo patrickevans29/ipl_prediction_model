@@ -1,7 +1,10 @@
+import numpy as np
 import pandas as pd
 from google.cloud import bigquery
 from pathlib import Path
 import numpy as np
+
+from model.ml_logic.feature_engineer import player_features_dataset
 
 '''
 This module is used for cleaning data that can be
@@ -204,6 +207,7 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns = ['Team1_MVP_appearances', 'Team2_MVP_appearances'])
     
     df = clean_data(df)
+
     return df
 
 def get_data_with_cache(
