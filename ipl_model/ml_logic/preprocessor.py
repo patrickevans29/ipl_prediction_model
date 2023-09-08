@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
-from model.params import *
+from ipl_model.params import *
 
 def preprocess_features(df: pd.DataFrame) -> pd.DataFrame:
     '''

@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 
 from registry import *
 from data import *
-from model.params import *
+from ipl_model.params import *
 from preprocessor import *
 
 '''
