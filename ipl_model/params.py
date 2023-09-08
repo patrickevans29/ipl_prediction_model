@@ -10,6 +10,14 @@ GCP_PROJECT = os.environ.get("GCP_PROJECT")
 BQ_DATASET = os.environ.get("BQ_DATASET")
 MODEL_TARGET = os.environ.get("MODEL_TARGET")
 
+##################  CONSTANTS  ##################
+PLAYER_PROCESSING_COLUMNS = ['ID', 'innings', 'overs', 'ballnumber', 'batter',
+        'bowler', 'non_striker', 'extra_type', 'batsman_run', 'extras_run',
+        'total_run', 'non_boundary', 'isWicketDelivery', 'player_out', 'kind',
+        'fielders_involved', 'BattingTeam']
+
+WIN_LOSS_PROCESSING_COLUMNS = ['ID', 'Season', 'Team1', 'Team2', 'WinningTeam',
+                             'Player_of_Match', 'Team1Players', 'Team2Players']
 
 COLUMN_NAMES = ['Team1', 'Team2', 'Venue', 'TossDecision',
                 'Team1_Win', 'Team2_innings_total', 'Team_1_batting_average',
@@ -40,3 +48,4 @@ PLAYER_PROCESSING_COLUMNS = ['ID', 'innings', 'overs', 'ballnumber', 'batter',
 
 WIN_LOSS_PROCESSING_COLUMNS = ['ID', 'Season', 'Team1', 'Team2', 'WinningTeam',
                              'Player_of_Match', 'Team1Players', 'Team2Players']
+
