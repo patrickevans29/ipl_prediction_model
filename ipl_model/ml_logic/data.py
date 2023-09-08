@@ -1,10 +1,7 @@
 import numpy as np
 import pandas as pd
-from google.cloud import bigquery
+#from google.cloud import bigquery
 from pathlib import Path
-import numpy as np
-
-from model.ml_logic.feature_engineer import player_features_dataset
 
 '''
 This module is used for cleaning data that can be
@@ -24,7 +21,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # cleaning the string values
     # batter
     df["batter"] = [text.strip() for text in df["batter"]] # removing space
-    df["batter"] = [text.lower() for text in df["batter"]] # lowercase 
+    df["batter"] = [text.lower() for text in df["batter"]] # lowercase
     # bowler
     df["bowler"] = [text.strip() for text in df["bowler"]]
     df["bowler"] = [text.lower() for text in df["bowler"]]
@@ -50,11 +47,11 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df["BattingTeam"] = [text.strip() for text in df["BattingTeam"]]
     df["BattingTeam"] = [text.lower() for text in df["BattingTeam"]]
     # some teams change their name since 2008
-    team_name_dict = {'rising pune supergiants': 'rising pune supergiant', 
+    team_name_dict = {'rising pune supergiants': 'rising pune supergiant',
                   'kings xi punjab': 'punjab kings',
                   'delhi daredevils': 'delhi capitals'}
     df['BattingTeam'] = df['BattingTeam'].replace(team_name_dict)
-    
+
     ## cleaning data from match dataframe
     # Adding the correct City for the matching Venue
     df.loc[df.Venue == 'Dubai International Cricket Stadium','City'] = 'Dubai'
@@ -63,7 +60,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     venues_dict = {'Arun Jaitley Stadium, Delhi': 'Arun Jaitley Stadium',
                 'Brabourne Stadium, Mumbai': 'Brabourne Stadium',
                 'Dr DY Patil Sports Academy, Mumbai': 'Dr DY Patil Sports Academy',
-                'Eden Gardens, Kolkata': 'Eden Gardens',  
+                'Eden Gardens, Kolkata': 'Eden Gardens',
                 'M Chinnaswamy Stadium': 'M.Chinnaswamy Stadium',
                 'MA Chidambaram Stadium, Chepauk': 'MA Chidambaram Stadium',
                 'MA Chidambaram Stadium, Chepauk, Chennai': 'MA Chidambaram Stadium',
@@ -98,7 +95,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns='method')
     # Results from margin related to Superover and have been filled with 0
     df['Margin'] = df['Margin'].fillna(0)
-    
+
     # Updating dates so we are able to identify seasonal changes in data
     season_dict = {'2020/21': '2020',
                 '2009/10': '2010',
@@ -110,10 +107,10 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Stripping the data for each column
     for column in df_columns:
         df[column] = [text.strip().lower() for text in df[column]]
-    
+
     print("✅ data cleaned")
     return df
-    
+
 
 def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     '''
@@ -144,7 +141,7 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     # Merge the innings_totals DataFrame back into new_df on 'ID'
     df = pd.merge(df, innings_totals, left_on='ID', right_index=True)
     df['team_batting_average'] = df.groupby('BattingTeam')['total_run'].transform('sum') / df.groupby('BattingTeam')['ID'].transform('nunique')
-    # Extract the relevant columns 
+    # Extract the relevant columns
     selected_columns = ['ID', 'innings', 'Team1', 'Team2', 'team_batting_average', 'MatchNumber','WinningTeam', 'innings_total', 'City', 'Date', 'Venue', 'TossWinner', 'TossDecision', 'Team1Players', 'Team2Players']
     new_df = df[selected_columns].copy()
     new_df.head()
@@ -165,22 +162,22 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     final_data.reset_index(drop=True, inplace=True)
     # drop the duplicate columns
     final_data.drop(columns=["Team1", "Team2"], inplace=True)
-    # merge with the main df 
+    # merge with the main df
     df = pd.merge(df, final_data, on = "ID")
     # drop the useless column
     df.drop(columns=['team_batting_average'], inplace=True)
     # new binary column for the toss winner
     df['team_1_toss_winner'] = (df['Team1'] == df['TossWinner']).astype(int)
-    
+
     # Apply the function
     df['MatchImportance'] = df['MatchNumber'].apply(map_match_number)
     # Calculate the average points scored against a each team
     df['Team1_points_against_avg'] = df.groupby('Team1')['Team2_innings_total'].transform('mean')
     df['Team2_points_against_avg'] = df.groupby('Team2')['Team1_innings_total'].transform('mean')
     # Calculate the average number of times that team_1 has MVP
-    
+
     df['Team_MVP'] = df.apply(lambda row: get_match_winner(row['Player_of_Match'], row['Team1Players'], row['Team2Players']), axis=1)
-    
+
     df['Team_MVP'] = df.apply(replace_team_mvp_with_name, axis=1)
     team_mvp_counts = df['Team_MVP'].value_counts().reset_index()
 
@@ -205,10 +202,13 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     df['Team1_MVP_average'] = df['Team1_MVP_appearances'] / total_games[df['Team1']].values
     df['Team2_MVP_average'] = df['Team2_MVP_appearances'] / total_games[df['Team2']].values
     df = df.drop(columns = ['Team1_MVP_appearances', 'Team2_MVP_appearances'])
-    
-    df = clean_data(df)
 
-    return df
+    # Drop duplicates based on 'ID' column and keep the first occurrence
+    final_data = df.drop_duplicates(subset='ID', keep='first')
+
+    print(f"✅ New featured engineered new shape is {final_data.shape}")
+
+    return final_data
 
 def get_data_with_cache(
         gcp_project:str,
@@ -283,8 +283,9 @@ def get_data(userinput: list) -> pd.DataFrame:
     asks for a prediction.
 
     pass # ADD CODE HERE
-    
-# define the importance of each match 
+'''
+
+# define the importance of each match
 def map_match_number(value):
             if isinstance(value, int) or value.isnumeric():
                 return 1
@@ -297,21 +298,21 @@ def map_match_number(value):
 
 def get_match_winner(player_of_match, team1_players, team2_players):
             if pd.isna(player_of_match):
-                return 'N/A'  
-            
+                return 'N/A'
+
             if pd.isna(team1_players):
-                team1_players = []  
-            
+                team1_players = []
+
             if pd.isna(team2_players):
-                team2_players = [] 
-            
+                team2_players = []
+
             if player_of_match in team1_players:
                 return 'Team1'
             elif player_of_match in team2_players:
                 return 'Team2'
             else:
                 return 'N/A'
-            
+
 def replace_team_mvp_with_name(row):
             if row['Team_MVP'] == 'Team1':
                 return row['Team1']

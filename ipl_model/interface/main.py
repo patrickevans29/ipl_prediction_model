@@ -6,11 +6,11 @@ from dateutil.parser import parse
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from model.params import *
-from model.ml_logic.data import get_data_with_cache, clean_data, load_data_to_bq
-from model.ml_logic.model import initialize_model, train_model, evaluate_model
-from model.ml_logic.preprocessor import preprocess_features
-from model.ml_logic.registry import load_model, save_model, save_results
+from ipl_model.params import *
+from ipl_model.ml_logic.data import get_data_with_cache, clean_data, load_data_to_bq
+from ipl_model.ml_logic.make_model import initialize_model, train_model, evaluate_model
+from ipl_model.ml_logic.preprocessor import preprocess_features
+from ipl_model.ml_logic.registry import load_model, save_model, save_results
 
 def preprocess() -> None:
     """
@@ -135,20 +135,20 @@ def train(split_ratio: float = 0.02
 
     return accuracy
 
-def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
+def pred(df: pd.DataFrame = None) -> np.ndarray:
     """
     Make a prediction using the latest trained model
     """
 
     print("\n⭐️ Use case: predict")
 
-    if X_pred is None:
+    if df is None:
         return "Unable to make prediction"
 
     model = load_model()
     assert model is not None
 
-    X_processed = preprocess_features(X_pred)
+    X_processed = preprocess_features(df)
     y_pred = model.predict(X_processed)
 
     print("\n✅ prediction done: ", y_pred, y_pred.shape, "\n")

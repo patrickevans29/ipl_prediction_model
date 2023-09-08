@@ -1,8 +1,0 @@
-numpy==1.23.5
-pandas==1.5.3
-google-cloud-bigquery
-google-cloud-storage
-
-# API
-fastapi
-unicorn

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from model.params import *
+from ipl_model.params import *
 
 def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -97,7 +97,7 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     batting_stats_merged['batting_strike_rate'] = round\
         ((batting_stats_merged['total_runs'] * 100)/batting_stats_merged['balls_faced'], 2).fillna(0)
 
-    batting_stats_merged.rename(columns={'batter': 'player'})
+    batting_stats_merged = batting_stats_merged.rename(columns={'batter': 'player'})
 
     print("✅ Batting Features Created")
 
@@ -181,7 +181,7 @@ def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns the features processed.
     """
     assert isinstance(df, pd.DataFrame)
-    assert isinstance(df['Team1Players'], list)
+    assert isinstance(df['Team1Players'][0], list)
 
     df = df[WIN_LOSS_PROCESSING_COLUMNS]
 
@@ -192,7 +192,7 @@ def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
     def team_1_wins(Team1, Team2, WinningTeam):
         if WinningTeam == Team1:
             return 1
-        elif WinningTeam == Team1:
+        elif WinningTeam == Team2:
             return 0
         else:
             return -1
