@@ -84,7 +84,7 @@ user_input_df = pd.DataFrame(user_input_data)
 
 params = None # ADD CODE
 
-ipl_prediction_model_url = "http://127.0.0.1:8000" # Running locally
+ipl_prediction_model_url = "http://127.0.0.1:8000/predict" # Running locally
 response = requests.get(ipl_prediction_model_url, params=user_input_data)
 prediction = response.json()
 

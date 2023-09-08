@@ -6,11 +6,11 @@ from dateutil.parser import parse
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from model.params import *
-from model.ml_logic.data import get_data_with_cache, clean_data, load_data_to_bq
-from model.ml_logic.make_model import initialize_model, train_model, evaluate_model
-from model.ml_logic.preprocessor import preprocess_features
-from model.ml_logic.registry import load_model, save_model, save_results
+from ipl_model.params import *
+from ipl_model.ml_logic.data import get_data_with_cache, clean_data, load_data_to_bq
+from ipl_model.ml_logic.make_model import initialize_model, train_model, evaluate_model
+from ipl_model.ml_logic.preprocessor import preprocess_features
+from ipl_model.ml_logic.registry import load_model, save_model, save_results
 
 def preprocess() -> None:
     """

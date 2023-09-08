@@ -8,7 +8,7 @@ import pandas as pd
 from typing import Any
 
 #from google.cloud import storage
-from model.params import *
+from ipl_model.params import *
 
 def load_data_locally() -> pd.DataFrame:
     '''
