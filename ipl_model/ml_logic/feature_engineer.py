@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from model.params import *
+from ipl_model.params import *
 
 def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     """
