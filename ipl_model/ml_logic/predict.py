@@ -15,7 +15,7 @@ def pred(df: pd.DataFrame = None) -> np.ndarray:
         return "Unable to make prediction"
 
     model = load_model()
-    assert model is not None
+    # assert model is not None
 
     X_processed = preprocess_features(df)
     y_pred = model.predict(X_processed)

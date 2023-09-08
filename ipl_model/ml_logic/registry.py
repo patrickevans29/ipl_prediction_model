@@ -107,10 +107,10 @@ def load_model() -> Any:
         print(f"\nLoad latest model from local registry...")
 
         # Get a list of all model paths in the specified directory
-        local_model_paths = glob.glob(f"{LOCAL_MODELS_PATH}/*.pkl")
+        local_model_paths = glob.glob(f"{LOCAL_MODELS_PATH}/*")
 
         if not local_model_paths:
-            print("No model files found in the local directory.")
+            print(f"No model files found in the local directory: {local_model_paths}")
             return None
 
         # Sort the model paths by filename (which contains the timestamp)
