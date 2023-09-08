@@ -3,12 +3,9 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from ipl_model.interface.main import pred
+from ipl_model.ml_logic.predict import pred
 
 app = FastAPI()
-
-# Set a long timeout
-app.add_middleware(TimeoutMiddleware, timeout_seconds=60)
 
 # Allowing all middleware for dev purposes
 app.add_middleware(
@@ -18,6 +15,10 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headersdir
 )
+
+@app.get("/")
+def hello():
+    return {"Hello": "You"}
 
 @app.get("/predict")
 def predict(user_input_data: dict)->dict:

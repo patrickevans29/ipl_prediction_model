@@ -1,0 +1,14 @@
+ipdb
+ipykernel
+matplotlib
+numpy==1.23.5
+pandas==1.5.3
+scikit-learn==1.2.1
+seaborn
+google-cloud-bigquery
+google-cloud-storage
+xgboost
+python-dotenv
+prefect==2.8.1
+fastapi
+uvicorn
