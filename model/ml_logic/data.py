@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from google.cloud import bigquery
 from pathlib import Path
-import numpy as np
 
 from model.ml_logic.feature_engineer import player_features_dataset
 
