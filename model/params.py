@@ -1,8 +1,8 @@
 import os
 
 #####CONSTANTS#####
-LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "iplpredictionmodel", "raw_data")
-LOCAL_MODELS_PATH =  os.path.join(os.path.expanduser('~'), "iplpredictionmodel", "model", "trained_models")
+LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "code", "ipl_prediction_model", "raw_data")
+LOCAL_MODELS_PATH =  os.path.join(os.path.expanduser('~'), "code", "ipl_prediction_model", "model", "trained_models")
 
 ##################  VARIABLES  ##################
 BUCKET_NAME = os.environ.get("BUCKET_NAME") # Make sure the env file is made
@@ -16,9 +16,18 @@ COLUMN_NAMES = ['Team1', 'Team2', 'Venue', 'TossDecision',
                 'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
                 'Team1_points_against_avg', 'Team2_points_against_avg',
                 'Team1_MVP_average', 'Team2_MVP_average']
+
 TARGET_NAME = ['Team1_Win']
+
 FEATURE_NAMES = ['Team1', 'Team2', 'Venue', 'TossDecision',
                  'Team2_innings_total', 'Team_1_batting_average',
+                 'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
+                 'Team1_points_against_avg', 'Team2_points_against_avg',
+                 'Team1_MVP_average', 'Team2_MVP_average']
+
+CATAGORICAL_COLUMNS = ['Team1', 'Team2', 'Venue', 'TossDecision']
+
+NUMERICAL_COLUMNS = ['Team2_innings_total', 'Team_1_batting_average',
                  'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
                  'Team1_points_against_avg', 'Team2_points_against_avg',
                  'Team1_MVP_average', 'Team2_MVP_average']

@@ -5,10 +5,12 @@ import pickle
 import xgboost as xgb
 import pandas as pd
 
-from google.cloud import storage
+from typing import Any
+
+#from google.cloud import storage
 from model.params import *
 
-def load_data_locally() -> pd.Dataframe:
+def load_data_locally() -> pd.DataFrame:
     '''
     Accesses the raw_data directory to retrieve the two datasets
     and merges them in a pandas dataframe. This data can then be
@@ -16,6 +18,7 @@ def load_data_locally() -> pd.Dataframe:
     '''
     # Create the file path to the ball_by_ball.csv file
     csv_file_path_ball = os.path.join(LOCAL_DATA_PATH, "IPL_Ball_by_Ball_2008_2022.csv")
+    print(csv_file_path_ball)
 
     # Check to see if the file is there
     if os.path.exists(csv_file_path_ball):
@@ -63,14 +66,13 @@ def save_results(params: dict, metrics: dict) -> None:
     print("✅ Results saved locally")
 
 def save_model(model) -> None:
-    '''
-    This will save the XGBoost model locally at LOCAL_MODELS_PATH.
-    '''
-
     timestamp = time.strftime("%Y%m%d-%H%M%S")
+    model_path = os.path.join(LOCAL_MODELS_PATH, f"{timestamp}.xgbmodel")
+
+    # Create the directory if it doesn't exist
+    os.makedirs(LOCAL_MODELS_PATH, exist_ok=True)
 
     # Save the model locally using pickle
-    model_path = os.path.join(LOCAL_MODELS_PATH, f"{timestamp}.xgbmodel")
     with open(model_path, 'wb') as model_file:
         pickle.dump(model, model_file)
 
@@ -90,7 +92,7 @@ def save_model(model) -> None:
 
     return None
 
-def load_model() -> xgb.Model:
+def load_model() -> Any:
     """
     Return a saved model:
     - locally (latest one in alphabetical order)

@@ -1,10 +1,8 @@
 import numpy as np
 import pandas as pd
-from google.cloud import bigquery
+#from google.cloud import bigquery
 from pathlib import Path
 import numpy as np
-
-from model.ml_logic.feature_engineer import player_features_dataset
 
 '''
 This module is used for cleaning data that can be
@@ -206,9 +204,12 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     df['Team2_MVP_average'] = df['Team2_MVP_appearances'] / total_games[df['Team2']].values
     df = df.drop(columns = ['Team1_MVP_appearances', 'Team2_MVP_appearances'])
 
-    df = clean_data(df)
+    # Drop duplicates based on 'ID' column and keep the first occurrence
+    final_data = df.drop_duplicates(subset='ID', keep='first')
 
-    return df
+    print(f"✅ New featured engineered new shape is {final_data.shape}")
+
+    return final_data
 
 def get_data_with_cache(
         gcp_project:str,

@@ -9,14 +9,6 @@ This front queries the Le Wagon IPL Prediction Model Team's model
 (https://....ADD THE API HERE....)
 '''
 
-@st.cache_data # This will tell streamlit to keep the model in cache
-def load_model():
-    '''
-    Load your trained model from ml-logic
-    '''
-    pass # ADD CODE HERE
-
-model = load_model()
 team_names = ['rajasthan royals', 'royal challengers bangalore',
        'sunrisers hyderabad', 'delhi capitals', 'chennai super kings',
        'gujarat titans', 'lucknow super giants', 'kolkata knight riders',
@@ -73,13 +65,13 @@ toss_decision = st.selectbox("What was the Toss Decision?", ["bat", "bowl"])
 user_input_data = {
     'Team1': [home_team],
     'Team2': [away_team],
-    'Team1_Batting_Average': [home_batting_average],
-    'Team2_Batting_Average': [away_batting_average],
-    'Team1_Toss_Winner': [home_toss_winner],
-    'Team1_Points_Against_Avg': [home_points_against_avg],
-    'Team2_Points_Against_Avg': [away_points_against_avg],
-    'Team1_MVP_Average': [home_mvp_average],
-    'Team2_MVP_Average': [away_mvp_average],
+    'TeamA_batting_average': [home_batting_average],
+    'TeamB_batting_average': [away_batting_average],
+    'Team_1_toss_winner': [home_toss_winner],
+    'Team1_points_against_avg': [home_points_against_avg],
+    'Team2_points_against_avg': [away_points_against_avg],
+    'Team1_MVP_average': [home_mvp_average],
+    'Team2_MVP_average': [away_mvp_average],
     'Venue': [venue],
     'MatchImportance': [match_importance],
     'TossDecision': [toss_decision]
@@ -89,10 +81,11 @@ user_input_df = pd.DataFrame(user_input_data)
 
 # Write some code to get the other parameters needed for the model
 
+
 params = None # ADD CODE
 
-ipl_prediction_model_url = None # ADD CODE
-response = requests.get(ipl_prediction_model_url, params=params)
+ipl_prediction_model_url = "http://127.0.0.1:8000" # Running locally
+response = requests.get(ipl_prediction_model_url, params=user_input_data)
 prediction = response.json()
 
 # Call the make the prediction
