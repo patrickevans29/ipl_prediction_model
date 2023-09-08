@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from ipl_model.ml_logic.predict import pred
-from ipl_model.ml_logic.preprocessor import preprocess_features
 
 app = FastAPI()
 
@@ -60,10 +59,10 @@ def predict(
 
     # Ensure the data has the correct shape (1, 12) for prediction
     if df.shape != (1, 12):
-        return {"error": "Invalid data shape"}
+        raise HTTPException(status_code=400, detail="Invalid data shape")
 
-    prediction = pred(df)
+    prediction = float(pred(df))
 
-    my_dict_return = {'Prediction': prediction[0]}  # Assuming prediction is a 1D array
+    my_dict_return = {'Prediction': prediction}
 
     return my_dict_return
