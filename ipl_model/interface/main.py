@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 
 from ipl_model.params import *
 from ipl_model.ml_logic.data import get_data_with_cache, clean_data, load_data_to_bq
-from ipl_model.ml_logic.make_model import initialize_model, train_model, evaluate_model
+from ipl_model.ml_logic.make_model import initialize_model, train_model
 from ipl_model.ml_logic.preprocessor import preprocess_features
 from ipl_model.ml_logic.registry import load_model, save_model, save_results
 
