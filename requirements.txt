@@ -10,6 +10,7 @@ google-cloud-storage
 
 python-dotenv
 prefect==2.8.1
+xgboost
 
 # API
 fastapi

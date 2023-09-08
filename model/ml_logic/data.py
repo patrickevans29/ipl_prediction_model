@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 #from google.cloud import bigquery
 from pathlib import Path
-import numpy as np
 
 '''
 This module is used for cleaning data that can be
