@@ -20,7 +20,7 @@ FILL IN THE ENV FILE:
 FUNCTIONS TO WRITE
   ml_logic.data:
     - def clean_data()
-    - def function_engineer()
+    - def feature_engineer()
 
 FUNCTIONS TO UPDATE
   model.interface.main.py
