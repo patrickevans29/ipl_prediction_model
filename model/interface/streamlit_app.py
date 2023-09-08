@@ -50,8 +50,26 @@ venues = ['narendra modi stadium, ahmedabad', 'eden gardens',
 st.title('IPL Match Prediction')
 
 # Add user input elements
-st.header('Choose Teams and Venue')
+st.header('Choose Teams and Statistics')
+st.subheader('Away Team Stats')
 home_team = st.selectbox('Select Home Team', team_names)
+home_batting_average = st.number_input('Select Home Team Batting Average')
+home_toss_winner = st.radio("Did team1 win the toss?", [0,1])
+home_points_against_avg = st.number_input('Select Average Runs Against Home Team')
+home_mvp_average = st.number_input('Select Average Times Home Team has MVP')
+
+st.subheader('Away Team Stats')
+away_team = st.selectbox('Select Away Team', team_names)
+away_batting_average = st.number_input('Select Away Team Batting Average')
+away_points_against_avg = st.number_input('Select Average Runs Against Away Team')
+away_mvp_average = st.number_input('Select Average Times Away Team has MVP')
+
+st.subheader('Match Conditions')
+venue = st.selectbox('Venue', venues)
+match_importance = st.radio("How important is the match?", [1, 2, 3])
+
+
+
 away_team = st.selectbox('Select Away Team', team_names)
 venue = st.selectbox('Select Venue', venues)
 

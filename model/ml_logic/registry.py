@@ -5,7 +5,6 @@ import pickle
 import xgboost as xgb
 
 from google.cloud import storage
-
 from model.params import *
 
 def save_results(params: dict, metrics: dict) -> None:

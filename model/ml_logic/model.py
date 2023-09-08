@@ -1,6 +1,6 @@
 import numpy as np
 import xgboost as xgb
-import pandas as pd
+
 from xgboost import XGBClassifier
 
 
@@ -19,7 +19,9 @@ def initialize_model() -> xgb.Model:
                           subsample = 0.8)
     print("✅ Model initialized")
 
-def train_model(model: Model,
+    return model
+
+def train_model(model: XGBClassifier.Model,
         X: np.ndarray,
         y: np.ndarray):
 
@@ -28,5 +30,5 @@ def train_model(model: Model,
     be cleaned and engineered and preprocessed.
     '''
     model = model.fit(X, y)
-    
+
     return model
