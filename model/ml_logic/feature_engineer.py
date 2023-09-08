@@ -12,6 +12,8 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     assert isinstance(df, pd.DataFrame)
 
+    df = df[PLAYER_PROCESSING_COLUMNS]
+
     ### Total Runs
     batter_total_runs = df.groupby(['batter'], as_index=False)['batsman_run']\
         .sum('batsman_run').rename(columns={'batsman_run': 'total_runs'})
@@ -42,14 +44,11 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     ### Batsman Totals
     batsman_score_game = df.groupby(['ID', 'batter'], as_index=False)\
                         ['batsman_run'].sum().drop(columns='ID')
-    zero = batsman_score_game[batsman_score_game['batsman_run'] == 0]\
-        .groupby(['batter'], as_index=False).count().rename(columns={'batsman_run': 'zero'})
     fifty = batsman_score_game[batsman_score_game['batsman_run'] >= 50]\
         .groupby(['batter'], as_index=False).count().rename(columns={'batsman_run': '50s'})
     hundred = batsman_score_game[batsman_score_game['batsman_run'] >= 100]\
         .groupby(['batter'], as_index=False).count().rename(columns={'batsman_run': '100s'})
-    merged_totals = zero.merge(fifty, on='batter', how='outer').merge(hundred, on='batter', how='outer').fillna(0)
-    merged_totals['zero'] = merged_totals['zero'].astype('int')
+    merged_totals = fifty.merge(hundred, on='batter', how='outer').fillna(0)
     merged_totals['50s'] = merged_totals['50s'].sub(merged_totals['100s']).astype('int')
     merged_totals['100s'] = merged_totals['100s'].astype('int')
 
@@ -98,12 +97,14 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     batting_stats_merged['batting_strike_rate'] = round\
         ((batting_stats_merged['total_runs'] * 100)/batting_stats_merged['balls_faced'], 2).fillna(0)
 
+    batting_stats_merged.rename(columns={'batter': 'player'})
+
     print("✅ Batting Features Created")
 
     return batting_stats_merged
 
 
-def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
+def player_bowling_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Takes the ball by ball match cleaned dataframe as a base.
     Creates a dataframe of player bowling features extracted from the
@@ -111,6 +112,8 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns the features processed.
     """
     assert isinstance(df, pd.DataFrame)
+
+    df = df[PLAYER_PROCESSING_COLUMNS]
 
     ### Bowler Innings
     bowler_innings = df.groupby(['bowler'], as_index=False)['ID'].nunique()\
@@ -164,6 +167,144 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     bowling_stats_merged['bowling_strike_rate'] = np.where\
         (bowling_stats_merged['bowling_strike_rate'] == np.inf, 0, bowling_stats_merged['bowling_strike_rate'])
 
+    bowling_stats_merged = bowling_stats_merged.rename(columns={'bowler': 'player'})
+
     print("✅ Bowling Features Created")
 
     return bowling_stats_merged
+
+
+def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Takes a cleaned dataframe as a base.
+    Creates a dataframe of player win loss statistics.
+    Returns the features processed.
+    """
+    assert isinstance(df, pd.DataFrame)
+    assert isinstance(df['Team1Players'], list)
+
+    df = df[WIN_LOSS_PROCESSING_COLUMNS]
+
+    ### Group to remove duplicates
+    df = df.groupby('ID', as_index=False).first()
+
+    ### Team 1 Wins
+    def team_1_wins(Team1, Team2, WinningTeam):
+        if WinningTeam == Team1:
+            return 1
+        elif WinningTeam == Team1:
+            return 0
+        else:
+            return -1
+
+    df['team_1_win'] = df.apply(lambda row: \
+        team_1_wins(row['Team1'], row['Team2'], row['WinningTeam']), axis=1)
+
+    ### Winning Player Count
+    def winning_team_players(team_1_win, Team1Players, Team2Players):
+        if team_1_win == 1:
+            return Team1Players
+        elif team_1_win == 0:
+            return Team2Players
+        else:
+            return []
+
+    df['winning_team_players'] = df.apply(lambda row: winning_team_players\
+        (row['team_1_win'], row['Team1Players'], row['Team2Players']), axis=1)
+
+    player_wins = []
+    def player_wins_list(winning_team_players):
+        for row in winning_team_players:
+            for player in row:
+                player_wins.append(player)
+        return player_wins
+
+    player_wins_list(df['winning_team_players'])
+
+    player_win_count = {}
+    for player in player_wins:
+        if player in player_win_count:
+            player_win_count[player] += 1
+        else:
+            player_win_count[player] = 1
+
+    wins = pd.DataFrame({'player': player_win_count.keys(), \
+                        'wins': player_win_count.values()})
+
+    ### Losing Player Count
+    def losing_team_players(team_1_win, Team1Players, Team2Players):
+        if team_1_win == 0:
+            return Team1Players
+        elif team_1_win == 1:
+            return Team2Players
+        else:
+            return []
+
+    df['losing_team_players'] = df.apply(lambda row: losing_team_players\
+        (row['team_1_win'], row['Team1Players'], row['Team2Players']), axis=1)
+
+    player_loses = []
+    def player_loses_list(losing_team_players):
+        for row in losing_team_players:
+            for player in row:
+                player_loses.append(player)
+        return player_loses
+
+    player_loses_list(df['losing_team_players'])
+
+    player_loss_count = {}
+    for player in player_loses:
+        if player in player_loss_count:
+            player_loss_count[player] += 1
+        else:
+            player_loss_count[player] = 1
+
+    loses = pd.DataFrame({'player': player_loss_count.keys(), \
+                            'loses': player_loss_count.values()})
+
+    ### Matches
+    matches = {}
+
+    for player in player_win_count:
+        if player in player_loss_count:
+            matches[player] = player_win_count[player] + player_loss_count[player]
+        elif player not in player_loss_count:
+            matches[player] = player_win_count[player]
+
+    for player in player_loss_count:
+        if player not in player_win_count:
+            matches[player] = player_loss_count[player]
+
+    matches = pd.DataFrame({'player': matches.keys(), \
+                            'matches': matches.values()})
+
+    ### Merge
+    win_loss_merge = matches.merge(wins, on='player', how='outer')\
+                        .merge(loses, on='player', how='outer').fillna(0)
+
+    ### Create Win Ratio
+    win_loss_merge['win_ratio'] = \
+        round((win_loss_merge['wins']/win_loss_merge['matches']), 2)
+
+    print("✅ Win Loss Features Created")
+
+    return win_loss_merge
+
+
+def player_features_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Takes a cleaned dataframe as a base.
+    Compiles the final player dataset.
+    """
+    assert isinstance(df, pd.DataFrame)
+
+    batting = player_batting_features(df)
+    bowling = player_bowling_features(df)
+    win_loss = win_loss_features(df)
+
+    final_player_dataset = batting.merge(bowling, on='player', how='outer')\
+                            .merge(win_loss, on='player', how='outer').fillna(0)
+
+    print("✅ Final Player Dataset Created")
+
+    return final_player_dataset
