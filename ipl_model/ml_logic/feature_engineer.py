@@ -34,8 +34,11 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     bat_innings = combined_innings_df.drop(columns=['batter_innings', 'non_striker_innings'])
 
     ### Boundaries
-    non_boundary = list(df[df['non_boundary'] == 1].index)
-    temp_df = df.drop(index=non_boundary)
+    if len(df[df['non_boundary'] == 1]) > 0:
+        non_boundary = list(df[df['non_boundary'] == 1].index)
+        temp_df = df.drop(index=non_boundary)
+    else:
+        temp_df = df
     fours = temp_df[temp_df['batsman_run'] == 4].groupby(['batter'], as_index=False)\
             ['batsman_run'].count().rename(columns={'batsman_run': 'fours'})
     sixes = temp_df[temp_df['batsman_run'] == 6].groupby(['batter'], as_index=False)\
@@ -53,9 +56,9 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     merged_totals['100s'] = merged_totals['100s'].astype('int')
 
     ### Batsman Not Out
-    last_ball_index_temp = list(df.groupby(['ID', 'innings'], as_index=False)['innings']\
-                        .idxmax().sort_values(by='innings', ascending=False)['innings'])
-    last_ball_index_temp.remove(0)
+    last_ball_index_temp = df.groupby(['ID', 'innings'], as_index=False)['innings']\
+                        .idxmax().sort_values(by='innings', ascending=False)['innings'].tolist()
+    last_ball_index_temp = last_ball_index_temp[:-1]
     last_ball_index = [index - 1 for index in last_ball_index_temp]
     last_ball_index.insert(0, df.shape[0])
     player_out_final_ball = df[(df['isWicketDelivery']==1) & (df.index.isin(last_ball_index))]\
@@ -181,7 +184,6 @@ def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
     Returns the features processed.
     """
     assert isinstance(df, pd.DataFrame)
-    assert isinstance(df['Team1Players'][0], list)
 
     df = df[WIN_LOSS_PROCESSING_COLUMNS]
 

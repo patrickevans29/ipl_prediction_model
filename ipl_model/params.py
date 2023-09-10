@@ -40,6 +40,13 @@ NUMERICAL_COLUMNS = ['Team_1_batting_average',
                  'Team1_points_against_avg', 'Team2_points_against_avg',
                  'Team1_MVP_average', 'Team2_MVP_average']
 
+TEAM_NAMES = ['rajasthan royals', 'royal challengers bangalore',
+       'sunrisers hyderabad', 'delhi capitals', 'chennai super kings',
+       'gujarat titans', 'lucknow super giants', 'kolkata knight riders',
+       'punjab kings', 'mumbai indians', 'rising pune supergiant',
+       'gujarat lions', 'pune warriors', 'deccan chargers',
+       'kochi tuskers kerala']
+
 ##################  CONSTANTS  ##################
 PLAYER_PROCESSING_COLUMNS = ['ID', 'innings', 'overs', 'ballnumber', 'batter',
         'bowler', 'non_striker', 'extra_type', 'batsman_run', 'extras_run',
