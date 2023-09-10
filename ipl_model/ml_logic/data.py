@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import ast
 #from google.cloud import bigquery
 from pathlib import Path
 
@@ -107,6 +108,9 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Stripping the data for each column
     for column in df_columns:
         df[column] = [text.strip().lower() for text in df[column]]
+
+    df['Team1Players'] = df['Team1Players'].apply(lambda x: ast.literal_eval(x))
+    df['Team2Players'] = df['Team2Players'].apply(lambda x: ast.literal_eval(x))
 
     print("✅ data cleaned")
     return df
