@@ -5,7 +5,6 @@ from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-
 from ipl_model.ml_logic.registry import *
 from ipl_model.ml_logic.data import *
 from ipl_model.params import *

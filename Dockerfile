@@ -1,4 +1,4 @@
-FROM python 3.10.6-buster
+FROM python:3.10.6-buster
 
 WORKDIR /prod
 
@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 
 COPY ipl_model ipl_model
 
-COPY setup setup
+COPY setup.py setup.py
 
 RUN pip install .
 
