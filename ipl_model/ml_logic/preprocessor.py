@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pickle
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -7,43 +8,42 @@ from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
 from ipl_model.params import *
 
-def preprocess_features(df: pd.DataFrame) -> pd.DataFrame:
+def create_sklearn_preprocessor() -> ColumnTransformer:
     '''
-    Depends on the model that we choose.
-    This should transform the cleaned dataset by normalising the data.
-    The output should have many more features due to OneHotEncoding.
+    To be able to process the data we can use an SKlearn pipeline
     '''
-    ## defining the list of categorical and numerical features
-    categorical_columns = CATAGORICAL_COLUMNS
-    numerical_columns = NUMERICAL_COLUMNS
-
-    ## apply the encoder, OneHotEncoder for categorical and the RobustScaler for numerical features
     categorical_transformer = Pipeline([
-        ('onehot', OneHotEncoder(sparse=False, handle_unknown='ignore'))
+        ('onehot', OneHotEncoder(handle_unknown='ignore'))
     ])
 
     numerical_transformer = Pipeline([
         ('scaler', RobustScaler())
     ])
 
-    def create_sklearn_preprocessor() -> ColumnTransformer:
-        '''
-        To be able to process the data we can use an SKlearn pipeline
-        '''
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('cat', categorical_transformer, categorical_columns),
-                ('num', numerical_transformer, numerical_columns)
-            ])
-
-        ## create the pipeline
-        pipeline = Pipeline([
-            ('preprocessor', preprocessor)
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('cat', categorical_transformer, CATAGORICAL_COLUMNS),
+            ('num', numerical_transformer, NUMERICAL_COLUMNS)
         ])
-        return pipeline
 
+    ## create the pipeline
+    pipeline = Pipeline([
+        ('preprocessor', preprocessor)
+    ])
+    return pipeline
+
+# Use this function to preprocess training data
+def preprocess_features(X):
     preprocessor = create_sklearn_preprocessor()
-    data_processed = preprocessor.fit_transform(df)
+    if isinstance(X, pd.DataFrame):
+        data_processed = preprocessor.fit_transform(X)
+    elif isinstance(X, np.ndarray):
+        data_processed = preprocessor.fit_transform(pd.DataFrame(X, columns=NUMERICAL_COLUMNS + CATAGORICAL_COLUMNS))
+    else:
+        raise ValueError("Unsupported input type. X must be a pandas DataFrame or a numpy array.")
 
-    print("✅ X_processed, with shape", data_processed.shape)
+    # Save the transformer for later
+    with open('preprocessor.pkl', 'wb') as file:
+        pickle.dump(preprocessor, file)
+
     return data_processed

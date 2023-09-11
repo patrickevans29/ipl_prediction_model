@@ -6,10 +6,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
-from registry import *
-from data import *
+from ipl_model.ml_logic.registry import *
+from ipl_model.ml_logic.data import *
 from ipl_model.params import *
-from preprocessor import *
+from ipl_model.ml_logic.preprocessor import *
 
 '''
 Here is where we will initialize and train the model
