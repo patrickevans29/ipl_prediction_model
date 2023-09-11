@@ -12,7 +12,7 @@ from ipl_model.params import *
 
 def create_sklearn_preprocessor() -> ColumnTransformer:
     '''
-    To be able to process the data we can use an SKlearn pipeline
+    Create a pipeline to process the data
     '''
     categorical_transformer = Pipeline([
         ('onehot', OneHotEncoder(handle_unknown='ignore'))
