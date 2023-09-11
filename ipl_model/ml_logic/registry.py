@@ -6,8 +6,8 @@ import xgboost as xgb
 import pandas as pd
 
 from typing import Any
+from google.cloud import storage
 
-#from google.cloud import storage
 from ipl_model.params import *
 
 def load_data_locally() -> pd.DataFrame:
@@ -67,7 +67,8 @@ def save_results(params: dict, metrics: dict) -> None:
 
 def save_model(model) -> None:
     timestamp = time.strftime("%Y%m%d-%H%M%S")
-    model_path = os.path.join(LOCAL_MODELS_PATH, f"{timestamp}.xgbmodel")
+    model_filename = f"{timestamp}.xgbmodel"
+    model_path = os.path.join(LOCAL_MODELS_PATH, model_filename)
 
     # Create the directory if it doesn't exist
     os.makedirs(LOCAL_MODELS_PATH, exist_ok=True)
@@ -78,17 +79,13 @@ def save_model(model) -> None:
 
     print("✅ XGBoost model saved locally")
 
-    return None
-
     # Save the model to GCS
-    '''
-    model_filename = model_path.split("/")[-1]
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
     blob = bucket.blob(f"models/{model_filename}")
     blob.upload_from_filename(model_path)
 
-    print("✅ Model saved to GCS")'''
+    print("✅ Model saved to GCS")
 
     return None
 
@@ -97,7 +94,6 @@ def load_model() -> Any:
     Return a saved model:
     - locally (latest one in alphabetical order)
     - or from GCS (most recent one) if MODEL_TARGET=='gcs'  --> for unit 02 only
-    - or from MLFLOW (by "stage") if MODEL_TARGET=='mlflow' --> for unit 03 only
 
     Return None (but do not Raise) if no model is found
 
@@ -130,30 +126,98 @@ def load_model() -> Any:
         return latest_model
 
     if MODEL_TARGET == "gcs":
-        # 🎁 We give you this piece of code as a gift. Please read it carefully! Add a breakpoint if needed!
-        print(f"\nLoad latest model from GCS...")
+        print(f"\nLoad latest XGBoost model from GCS...")
 
         client = storage.Client()
-        blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="model"))
+        blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models/"))
+
+
+        # Find the blob with the latest timestamp
+        latest_blob = max(blobs, key=lambda x: x.updated)
+
+        # Specify the path to save the downloaded model
+        latest_model_path_to_save = os.path.join(LOCAL_MODELS_PATH, os.path.basename(latest_blob.name))
+
+        # Download the latest model from GCS
+        latest_blob.download_to_filename(latest_model_path_to_save)
+
+        # Load the downloaded XGBoost model
+        #latest_model = xgb.Booster(model_file=latest_model_path_to_save)
+        with open(latest_model_path_to_save, 'rb') as model_file:
+                    latest_model = pickle.load(model_file)
+
+
+        print(f"✅ Latest model downloaded from cloud storage @ {latest_model_path_to_save}")
+
+        return latest_model
+
+        """except:
+            print(f"\n❌ No XGBoost model found in GCS bucket {BUCKET_NAME} @ {latest_model_path_to_save}")
+
+            return None"""
+
+def load_preprocessor() -> Any:
+    """
+    Load a saved preprocessor:
+    - locally (latest one in alphabetical order)
+    - or from GCS (most recent one) if MODEL_TARGET=='gcs'
+
+    Return None (but do not Raise) if no preprocessor is found
+
+    """
+
+    if MODEL_TARGET == "local":
+        print(f"\nLoad latest preprocessor from local registry...")
+
+        # Get a list of all preprocessor paths in the specified directory
+        local_preprocessor_paths = glob.glob(f"{LOCAL_PREPROCESSORS_PATH}/*")
+
+        if not local_preprocessor_paths:
+            print(f"No preprocessor files found in the local directory: {LOCAL_PREPROCESSORS_PATH}")
+            return None
+
+        # Sort the preprocessor paths by filename (which contains the timestamp)
+        local_preprocessor_paths_sorted = sorted(local_preprocessor_paths)
+
+        # Choose the most recent preprocessor path (last in the sorted list)
+        most_recent_preprocessor_path_on_disk = local_preprocessor_paths_sorted[-1]
+
+        print(f"\nLoad latest preprocessor from disk...")
+
+        # Load the most recent preprocessor using pickle
+        with open(most_recent_preprocessor_path_on_disk, 'rb') as preprocessor_file:
+            latest_preprocessor = pickle.load(preprocessor_file)
+
+        print("✅ Preprocessor loaded from local disk")
+
+        return latest_preprocessor
+
+    if MODEL_TARGET == "gcs":
+        # 🎁 We give you this piece of code as a gift. Please read it carefully! Add a breakpoint if needed!
+        print(f"\nLoad latest preprocessor from GCS...")
+
+        client = storage.Client()
+        blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="preprocessors/"))
 
         try:
             # Find the blob with the latest timestamp
             latest_blob = max(blobs, key=lambda x: x.updated)
 
-            # Specify the path to save the downloaded model
-            latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH, latest_blob.name)
+            # Specify the path to save the downloaded preprocessor
+            latest_preprocessor_path_to_save = os.path.join(LOCAL_PREPROCESSORS_PATH, os.path.basename(latest_blob.name))
 
-            # Download the latest model from GCS
-            latest_blob.download_to_filename(latest_model_path_to_save)
+            # Download the latest preprocessor from GCS
+            latest_blob.download_to_filename(latest_preprocessor_path_to_save)
 
-            # Load the downloaded XGBoost model
-            latest_model = xgb.Booster(model_file=latest_model_path_to_save)
+            # Load the downloaded preprocessor using pickle
+            with open(latest_preprocessor_path_to_save, 'rb') as preprocessor_file:
+                latest_preprocessor = pickle.load(preprocessor_file)
 
-            print("✅ Latest model downloaded from cloud storage")
+            print(f"✅ Latest preprocessor downloaded from cloud storage @ {latest_preprocessor_path_to_save}")
 
-            return latest_model
+            return latest_preprocessor
 
         except:
-            print(f"\n❌ No model found in GCS bucket {BUCKET_NAME}")
+            print(f"\n❌ No preprocessor found in GCS bucket {BUCKET_NAME} @ {latest_preprocessor_path_to_save}")
 
             return None
