@@ -3,6 +3,7 @@ import os
 #####CONSTANTS#####
 LOCAL_DATA_PATH = os.path.join(os.path.expanduser('~'), "code", "ipl_prediction_model", "raw_data")
 LOCAL_MODELS_PATH =  os.path.join(os.path.expanduser('~'), "code", "ipl_prediction_model", "model")
+LOCAL_PREPROCESSORS_PATH = os.path.join(os.path.expanduser('~'), "code", "ipl_prediction_model", "preprocessor")
 
 ##################  VARIABLES  ##################
 BUCKET_NAME = os.environ.get("BUCKET_NAME") # Make sure the env file is made

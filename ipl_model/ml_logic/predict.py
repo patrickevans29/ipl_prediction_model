@@ -1,8 +1,7 @@
-from ipl_model.ml_logic.registry import load_model
+from ipl_model.ml_logic.registry import load_model, load_preprocessor
 import numpy as np
 import pandas as pd
-from ipl_model.ml_logic.preprocessor import preprocess_features, create_sklearn_preprocessor
-import pickle
+
 
 def pred(df: pd.DataFrame = None) -> np.ndarray:
     """
@@ -17,8 +16,7 @@ def pred(df: pd.DataFrame = None) -> np.ndarray:
     model = load_model()
     # assert model is not None
     # Load the saved preprocessor using pickle
-    with open('preprocessor.pkl', 'rb') as file:
-        preprocessor = pickle.load(file)
+    preprocessor = load_preprocessor()
 
     X_processed = preprocessor.transform(df)
     y_pred = model.predict(X_processed)

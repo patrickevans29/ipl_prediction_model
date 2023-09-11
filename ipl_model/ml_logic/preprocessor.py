@@ -1,10 +1,12 @@
 import numpy as np
 import pandas as pd
 import pickle
+import time
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, RobustScaler
+from google.cloud import storage
 
 from ipl_model.params import *
 
@@ -42,8 +44,24 @@ def preprocess_features(X):
     else:
         raise ValueError("Unsupported input type. X must be a pandas DataFrame or a numpy array.")
 
-    # Save the transformer for later
-    with open('preprocessor.pkl', 'wb') as file:
-        pickle.dump(preprocessor, file)
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    preprocessor_path = os.path.join(LOCAL_PREPROCESSORS_PATH, f"{timestamp}_preprocessor.pkl")
+
+    # Create the directory if it doesn't exist
+    os.makedirs(LOCAL_PREPROCESSORS_PATH, exist_ok=True)
+
+    # Save the preprocessor locally using pickle
+    with open(preprocessor_path, 'wb') as preprocessor_file:
+        pickle.dump(preprocessor, preprocessor_file)
+
+    print("✅ Preprocessor saved locally")
+
+    # Save the preprocessor to GCS
+    client = storage.Client()
+    bucket = client.bucket(BUCKET_NAME)
+    blob = bucket.blob(f"preprocessors/{timestamp}_preprocessor.pkl")
+    blob.upload_from_filename(preprocessor_path)
+
+    print("✅ Preprocessor saved to GCS")
 
     return data_processed
