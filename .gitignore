@@ -9,3 +9,5 @@ __MACOSX
 # Jupyter Notebook #
 *checkpoint.ipynb
 *.ipynb_checkpoints
+
+*.json
