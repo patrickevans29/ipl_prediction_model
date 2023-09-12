@@ -9,6 +9,7 @@ from ipl_model.ml_logic.registry import *
 from ipl_model.ml_logic.data import *
 from ipl_model.params import *
 from ipl_model.ml_logic.preprocessor import *
+from ipl_model.ml_logic.feature_engineer import *
 
 '''
 Here is where we will initialize and train the model
@@ -18,11 +19,16 @@ def initialize_model():
     '''
     Add our baseline or our final model with the correct parameters here
     '''
-    model = XGBClassifier(colsample_bytre = 0.8,
-                          learning_rate = 0.01,
-                          max_depth = 4,
-                          n_estimators = 100,
-                          subsample = 0.8)
+    grid = {'max_depth': 5,
+       'base_score':0.5,
+       'booster': 'gblinear',
+        'gamma' : 0.1,
+        'n_estimators': 150,
+        'learning_rate': 0.1,
+        'reg_lambda': 0.3,
+       }
+
+    model = xgb.XGBClassifier(params=grid)
     print("✅ Model initialized")
 
     return model
@@ -45,11 +51,42 @@ complete_df = load_data_locally()
 # Clean the data
 cleaned_df = clean_data(complete_df)
 
-# Engineer the features that we need
-clean_engineered_df = feature_engineer(cleaned_df)
+# Engineer the team features that we need
+engineered_df = feature_engineer(cleaned_df)
+
+# Rename the columns
+df = engineered_df.rename({'TeamA_batting_average': 'Team1_batting_average',
+           'TeamB_batting_average': 'Team2_batting_average',
+           'TeamA_innings_total': 'Team1_innings_total',
+           'TeamB_innings_total' : 'Team2_innings_total'
+          }, axis=1)
+
+# WinningTeam = 1 --> Team1 Won
+def map_winning_team(row):
+    if row['WinningTeam'] == row['Team1']:
+        return 1
+    elif row['WinningTeam'] == row['Team2']:
+        return 0
+    else:
+        return -1
+
+df['WinningTeam'] = df.apply(map_winning_team, axis=1)
+# drop rows with Winning Team = -1
+df = df.drop(df[df['WinningTeam'] == -1].index)
+
+# Toss Winner --> 0 = away team ; 1 = home team
+def map_toss_winner(row):
+    if row['TossWinner'] == row['Team1']:
+        return 1
+    elif row['TossWinner'] == row['Team2']:
+        return 0
+    else:
+        return -1
+
+df['TossWinner'] = df.apply(map_toss_winner, axis=1)
 
 # Select only the columns that we need
-df_to_model = clean_engineered_df[COLUMN_NAMES]
+df_to_model = df[COLUMN_NAMES]
 
 # Create X and y
 X = df_to_model[FEATURE_NAMES]
