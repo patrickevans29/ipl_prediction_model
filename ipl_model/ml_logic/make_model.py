@@ -18,11 +18,16 @@ def initialize_model():
     '''
     Add our baseline or our final model with the correct parameters here
     '''
-    model = XGBClassifier(colsample_bytre = 0.8,
-                          learning_rate = 0.01,
-                          max_depth = 4,
-                          n_estimators = 100,
-                          subsample = 0.8)
+    grid = {'max_depth': 5,
+       'base_score':0.5,
+       'booster': 'gblinear',
+        'gamma' : 0.1,
+        'n_estimators': 150,
+        'learning_rate': 0.1,
+        'reg_lambda': 0.3,
+       }
+
+    model = xgb.XGBClassifier(params=grid)
     print("✅ Model initialized")
 
     return model
