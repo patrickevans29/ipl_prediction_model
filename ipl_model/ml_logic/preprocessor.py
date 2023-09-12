@@ -18,9 +18,11 @@ def create_sklearn_preprocessor() -> ColumnTransformer:
         ('onehot', OneHotEncoder(handle_unknown='ignore'))
     ])
 
+    '''
     categorical_transformer2 = Pipeline([
         ('label_encode', LabelEncoder())
     ])
+    '''
 
     numerical_transformer = Pipeline([
         ('scaler', RobustScaler())
@@ -29,7 +31,6 @@ def create_sklearn_preprocessor() -> ColumnTransformer:
     preprocessor = ColumnTransformer(
         transformers=[
             ('cat1', categorical_transformer1, CATAGORICAL_COLUMNS),
-            ('cat2', categorical_transformer2, ['Season']),
             ('num', numerical_transformer, NUMERICAL_COLUMNS)
         ])
 

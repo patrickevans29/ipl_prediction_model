@@ -23,7 +23,7 @@ def load_data_locally() -> pd.DataFrame:
     # Check to see if the file is there
     if os.path.exists(csv_file_path_ball):
         # Load it into a pandas df
-        players_df = pd.read_csv(csv_file_path_ball)
+        ball_df = pd.read_csv(csv_file_path_ball)
     else:
         print(f"The file {csv_file_path_ball} does not exist at {LOCAL_DATA_PATH}.")
 
@@ -33,12 +33,12 @@ def load_data_locally() -> pd.DataFrame:
     # Check to see if the file is there
     if os.path.exists(csv_file_path_match):
         # Load it into a pandas df
-        final_df = pd.read_csv(csv_file_path_match)
+        matches_df = pd.read_csv(csv_file_path_match)
     else:
         print(f"The file {csv_file_path_match} does not exist at {LOCAL_DATA_PATH}.")
 
     # Merge the two dataframes based on the "ID" column
-    merged_df = pd.merge(players_df, final_df, on="ID", how="inner")
+    merged_df = pd.merge(ball_df, matches_df, on="ID", how="inner")
 
     return merged_df
 
@@ -82,6 +82,8 @@ def load_model() -> Any:
         # Get a list of all model paths in the specified directory
         local_model_paths = glob.glob(f"{LOCAL_MODELS_PATH}/*")
 
+        print(local_model_paths)
+
         if not local_model_paths:
             print(f"No model files found in the local directory: {local_model_paths}")
             return None
@@ -113,7 +115,7 @@ def load_model() -> Any:
         latest_blob = max(blobs, key=lambda x: x.updated)
 
         # Specify the path to save the downloaded model
-        latest_model_path_to_save = os.path.join(LOCAL_MODELS_PATH, os.path.basename(latest_blob.name))
+        latest_model_path_to_save = os.path.join(DOCKER_MODEL_PATH, os.path.basename(latest_blob.name))
 
         # Download the latest model from GCS
         latest_blob.download_to_filename(latest_model_path_to_save)
@@ -181,7 +183,7 @@ def load_preprocessor() -> Any:
             latest_blob = max(blobs, key=lambda x: x.updated)
 
             # Specify the path to save the downloaded preprocessor
-            latest_preprocessor_path_to_save = os.path.join(LOCAL_PREPROCESSORS_PATH, os.path.basename(latest_blob.name))
+            latest_preprocessor_path_to_save = os.path.join(DOCKER_PREPROCESSOR_PATH, os.path.basename(latest_blob.name))
 
             # Download the latest preprocessor from GCS
             latest_blob.download_to_filename(latest_preprocessor_path_to_save)

@@ -108,7 +108,6 @@ def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
 
     return batting_stats_merged
 
-
 def player_bowling_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Takes the ball by ball match cleaned dataframe as a base.
@@ -320,6 +319,9 @@ def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
     '''
 
     players_df = get_player_features_dataset()
+
+    # Drop duplicates based on 'ID' column and keep the first occurrence
+    df = df.drop_duplicates(subset='ID', keep='first')
 
     #### NEW FEATURES ####
     # Calculates Team1 and Team2 weighted average
