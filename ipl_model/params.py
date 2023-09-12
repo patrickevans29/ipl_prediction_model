@@ -20,26 +20,23 @@ PLAYER_PROCESSING_COLUMNS = ['ID', 'innings', 'overs', 'ballnumber', 'batter',
 WIN_LOSS_PROCESSING_COLUMNS = ['ID', 'Season', 'Team1', 'Team2', 'WinningTeam',
                              'Player_of_Match', 'Team1Players', 'Team2Players']
 
-COLUMN_NAMES = ['Team1', 'Team2', 'Venue', 'TossDecision',
-                'Team1_Win', 'Team_1_batting_average',
-                'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
-                'Team1_points_against_avg', 'Team2_points_against_avg',
-                'Team1_MVP_average', 'Team2_MVP_average']
+COLUMN_NAMES = ['City', 'Season', 'Team1', 'Team2', 'Venue', 'TossWinner',
+       'TossDecision', 'WinningTeam', 'Avg_Weighted_Score_diff',
+       'batting_average_weighted_diff', 'batting_strike_rate_weighted_diff',
+       'bowling_average_diff', 'bowling_economy_rate_diff', 'win_ratio_diff']
 
-TARGET_NAME = ['Team1_Win']
+TARGET_NAME = ['WinningTeam']
 
-FEATURE_NAMES = ['Team1', 'Team2', 'Venue', 'TossDecision',
-                'Team_1_batting_average',
-                 'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
-                 'Team1_points_against_avg', 'Team2_points_against_avg',
-                 'Team1_MVP_average', 'Team2_MVP_average']
+FEATURE_NAMES = ['City', 'Season', 'Team1', 'Team2', 'Venue', 'TossWinner',
+       'TossDecision', 'Avg_Weighted_Score_diff',
+       'batting_average_weighted_diff', 'batting_strike_rate_weighted_diff',
+       'bowling_average_diff', 'bowling_economy_rate_diff', 'win_ratio_diff']
 
-CATAGORICAL_COLUMNS = ['Team1', 'Team2', 'Venue', 'TossDecision']
+CATAGORICAL_COLUMNS = ['Team1', 'Team2', 'Venue', 'TossDecision', 'City']
 
-NUMERICAL_COLUMNS = ['Team_1_batting_average',
-                 'Team_2_batting_average', 'team_1_toss_winner', 'MatchImportance',
-                 'Team1_points_against_avg', 'Team2_points_against_avg',
-                 'Team1_MVP_average', 'Team2_MVP_average']
+NUMERICAL_COLUMNS = ['TossWinner', 'TossDecision', 'Avg_Weighted_Score_diff',
+       'batting_average_weighted_diff', 'batting_strike_rate_weighted_diff',
+       'bowling_average_diff', 'bowling_economy_rate_diff', 'win_ratio_diff']
 
 TEAM_NAMES = ['rajasthan royals', 'royal challengers bangalore',
        'sunrisers hyderabad', 'delhi capitals', 'chennai super kings',

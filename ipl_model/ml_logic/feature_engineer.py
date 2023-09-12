@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 
 from ipl_model.params import *
+from ipl_model.ml_logic.data import *
+from ipl_model.ml_logic.registry import load_data_locally
 
 def player_batting_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -176,7 +178,6 @@ def player_bowling_features(df: pd.DataFrame) -> pd.DataFrame:
 
     return bowling_stats_merged
 
-
 def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Takes a cleaned dataframe as a base.
@@ -292,12 +293,13 @@ def win_loss_features(df: pd.DataFrame) -> pd.DataFrame:
 
     return win_loss_merge
 
-
-def player_features_dataset(df: pd.DataFrame) -> pd.DataFrame:
+def get_player_features_dataset():
     """
-    Takes a cleaned dataframe as a base.
     Compiles the final player dataset.
     """
+    df = load_data_locally()
+    df = clean_data(df)
+
     assert isinstance(df, pd.DataFrame)
 
     batting = player_batting_features(df)
@@ -310,3 +312,127 @@ def player_features_dataset(df: pd.DataFrame) -> pd.DataFrame:
     print("✅ Final Player Dataset Created")
 
     return final_player_dataset
+
+def feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    This is where we create the new features for the model combined with the engineered
+    player features.
+    '''
+
+    players_df = get_player_features_dataset()
+
+    #### NEW FEATURES ####
+    # Calculates Team1 and Team2 weighted average
+    df['Avg_Weighted_Score_Team1'] = df['Team1Players'].apply(lambda players: weighted_average_score(players, players_df))
+    df['Avg_Weighted_Score_Team2'] = df['Team2Players'].apply(lambda players: weighted_average_score(players, players_df))
+
+    df['batting_average_PlayersTeam1_weighted'] = df['Team1Players'].apply(lambda players: weighted_batting_average(players, players_df))
+    df['batting_average_PlayersTeam2_weighted'] = df['Team2Players'].apply(lambda players: weighted_batting_average(players, players_df))
+
+    df['batting_strike_rate_PlayersTeam1_weighted'] = df['Team1Players'].apply(lambda players: weighted_batting_strike_rate(players, players_df))
+    df['batting_strike_rate_PlayersTeam2_weighted'] = df['Team2Players'].apply(lambda players: weighted_batting_strike_rate(players, players_df))
+
+    # Calculates the bowling weighted averages
+    df['bowling_average_PlayersTeam1'] = df['Team1Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_average'].mean())
+    df['bowling_average_PlayersTeam2'] = df['Team2Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_average'].mean())
+
+    df['bowling_economy_rate_PlayersTeam1'] = df['Team1Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_economy_rate'].mean())
+    df['bowling_economy_rate_PlayersTeam2'] = df['Team2Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_economy_rate'].mean())
+
+    df['bowling_strike_rate_PlayersTeam1'] = df['Team1Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_strike_rate'].mean())
+    df['bowling_strike_rate_PlayersTeam2'] = df['Team2Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['bowling_strike_rate'].mean())
+
+    df['win_ratio_PlayersTeam1'] = df['Team1Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['win_ratio'].mean())
+    df['win_ratio_PlayersTeam2'] = df['Team2Players'].apply(lambda players: players_df[players_df['player'].isin(players)]['win_ratio'].mean())
+
+    # Calculates the differences between Team1 and Team2
+    df['Avg_Weighted_Score_diff'] = df['Avg_Weighted_Score_Team1'] - df['Avg_Weighted_Score_Team2']
+
+    df['batting_average_weighted_diff'] = df['batting_average_PlayersTeam1_weighted'] - df['batting_average_PlayersTeam2_weighted']
+
+    df['batting_strike_rate_weighted_diff'] = df['batting_strike_rate_PlayersTeam1_weighted'] - df['batting_strike_rate_PlayersTeam2_weighted']
+
+    df['bowling_average_diff'] = df['bowling_average_PlayersTeam1'] - df['bowling_average_PlayersTeam2']
+
+    df['bowling_economy_rate_diff'] = df['bowling_economy_rate_PlayersTeam1'] - df['bowling_economy_rate_PlayersTeam2']
+
+    df['bowling_strike_rate_diff'] = df['bowling_strike_rate_PlayersTeam1'] - df['bowling_strike_rate_PlayersTeam2']
+
+    df['win_ratio_diff'] = df['win_ratio_PlayersTeam1'] - df['win_ratio_PlayersTeam2']
+
+    # Drop duplicates based on 'ID' column and keep the first occurrence
+    final_data = df.drop_duplicates(subset='ID', keep='first')
+
+    print(f"✅ New featured engineered new shape is {final_data.shape}")
+
+    return final_data
+
+def weighted_average_score(players_list, players_df):
+    # Filters the player information in the DataFrame based on the names of the players in the list
+    player_info = players_df[players_df['player'].isin(players_list)].copy()
+
+    # Calculates the weight for each player based on the average_score (for example, using the square root function)
+
+    #square root function:
+    player_info['weight'] = np.sqrt(player_info['average_score'])
+
+    # Calculates the weighted average using the weights
+    weighted_avg = (players_df['average_score'] * player_info['weight']).sum() / player_info['weight'].sum()
+
+    return weighted_avg
+
+def weighted_batting_average(players_list, players_df):
+
+    player_info = players_df[players_df['player'].isin(players_list)].copy()
+
+    player_info['weight'] = np.sqrt(player_info['average_score'])
+
+    weighted_avg = (players_df['batting_average'] * player_info['weight']).sum() / player_info['weight'].sum()
+
+    return weighted_avg
+
+def weighted_batting_strike_rate(players_list, players_df):
+
+    player_info = players_df[players_df['player'].isin(players_list)].copy()
+
+    player_info['weight'] = np.sqrt(player_info['average_score'])
+
+    weighted_avg = (players_df['batting_strike_rate'] * player_info['weight']).sum() / player_info['weight'].sum()
+
+    return weighted_avg
+
+# define the importance of each match
+def map_match_number(value):
+            if isinstance(value, int) or value.isnumeric():
+                return 1
+            elif value in ['qualifier 2', 'eliminator', 'qualifier 1', 'qualifier', 'elimination final', '3rd place play-off', 'semi final']:
+                return 2
+            elif value == 'final':
+                return 3
+            else:
+                return 0
+
+def get_match_winner(player_of_match, team1_players, team2_players):
+            if pd.isna(player_of_match):
+                return 'N/A'
+
+            if pd.isna(team1_players):
+                team1_players = []
+
+            if pd.isna(team2_players):
+                team2_players = []
+
+            if player_of_match in team1_players:
+                return 'Team1'
+            elif player_of_match in team2_players:
+                return 'Team2'
+            else:
+                return 'N/A'
+
+def replace_team_mvp_with_name(row):
+            if row['Team_MVP'] == 'Team1':
+                return row['Team1']
+            elif row['Team_MVP'] == 'Team2':
+                return row['Team2']
+            else:
+                return row['Team_MVP']
