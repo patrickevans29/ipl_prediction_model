@@ -5,18 +5,24 @@ import time
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, RobustScaler
+from sklearn.preprocessing import OneHotEncoder, RobustScaler, LabelEncoder
 from google.cloud import storage
 
 from ipl_model.params import *
 
 def create_sklearn_preprocessor() -> ColumnTransformer:
     '''
-    To be able to process the data we can use an SKlearn pipeline
+    Create a pipeline to process the data
     '''
-    categorical_transformer = Pipeline([
+    categorical_transformer1 = Pipeline([
         ('onehot', OneHotEncoder(handle_unknown='ignore'))
     ])
+
+    '''
+    categorical_transformer2 = Pipeline([
+        ('label_encode', LabelEncoder())
+    ])
+    '''
 
     numerical_transformer = Pipeline([
         ('scaler', RobustScaler())
@@ -24,7 +30,7 @@ def create_sklearn_preprocessor() -> ColumnTransformer:
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ('cat', categorical_transformer, CATAGORICAL_COLUMNS),
+            ('cat1', categorical_transformer1, CATAGORICAL_COLUMNS),
             ('num', numerical_transformer, NUMERICAL_COLUMNS)
         ])
 

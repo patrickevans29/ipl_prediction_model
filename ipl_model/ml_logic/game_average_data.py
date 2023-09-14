@@ -18,7 +18,6 @@ def match_filter(df: pd.DataFrame,
     team_1, the list of teams to include as team_1
     team_2, the list of teams to include as team_2
     season, the list of seasons to include in the filter.
-
     Returns a filtered dataframe
     """
 

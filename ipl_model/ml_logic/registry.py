@@ -16,54 +16,31 @@ def load_data_locally() -> pd.DataFrame:
     and merges them in a pandas dataframe. This data can then be
     cleaned with clean_data().
     '''
-    # Create the file path to the ball_by_ball.csv file
+    # Create the file path to the IPL_Ball_by_Ball_2008_2022.csv file
     csv_file_path_ball = os.path.join(LOCAL_DATA_PATH, "IPL_Ball_by_Ball_2008_2022.csv")
     print(csv_file_path_ball)
 
     # Check to see if the file is there
     if os.path.exists(csv_file_path_ball):
         # Load it into a pandas df
-        ball_by_ball_df = pd.read_csv(csv_file_path_ball)
+        ball_df = pd.read_csv(csv_file_path_ball)
     else:
         print(f"The file {csv_file_path_ball} does not exist at {LOCAL_DATA_PATH}.")
 
-    # Create the file path to the IPL_Matches_2008_2022 file
+    # Create the file path to the IPL_Matches_2008_2022.csv file
     csv_file_path_match = os.path.join(LOCAL_DATA_PATH, "IPL_Matches_2008_2022.csv")
 
     # Check to see if the file is there
     if os.path.exists(csv_file_path_match):
         # Load it into a pandas df
-        match_df = pd.read_csv(csv_file_path_match)
+        matches_df = pd.read_csv(csv_file_path_match)
     else:
         print(f"The file {csv_file_path_match} does not exist at {LOCAL_DATA_PATH}.")
 
     # Merge the two dataframes based on the "ID" column
-    merged_df = pd.merge(ball_by_ball_df, match_df, on="ID", how="inner")  # Change how to "inner" if you want to keep only matching rows
+    merged_df = pd.merge(ball_df, matches_df, on="ID", how="inner")
 
     return merged_df
-
-def save_results(params: dict, metrics: dict) -> None:
-    """
-    Persist params & metrics locally on the hard drive at
-    "{LOCAL_REGISTRY_PATH}/params/{current_timestamp}.pickle"
-    "{LOCAL_REGISTRY_PATH}/metrics/{current_timestamp}.pickle"
-    """
-
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-
-    # Save params locally
-    if params is not None:
-        params_path = os.path.join(LOCAL_REGISTRY_PATH, "params", timestamp + ".pickle")
-        with open(params_path, "wb") as file:
-            pickle.dump(params, file)
-
-    # Save metrics locally
-    if metrics is not None:
-        metrics_path = os.path.join(LOCAL_REGISTRY_PATH, "metrics", timestamp + ".pickle")
-        with open(metrics_path, "wb") as file:
-            pickle.dump(metrics, file)
-
-    print("✅ Results saved locally")
 
 def save_model(model) -> None:
     timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -105,6 +82,8 @@ def load_model() -> Any:
         # Get a list of all model paths in the specified directory
         local_model_paths = glob.glob(f"{LOCAL_MODELS_PATH}/*")
 
+        print(local_model_paths)
+
         if not local_model_paths:
             print(f"No model files found in the local directory: {local_model_paths}")
             return None
@@ -136,7 +115,7 @@ def load_model() -> Any:
         latest_blob = max(blobs, key=lambda x: x.updated)
 
         # Specify the path to save the downloaded model
-        latest_model_path_to_save = os.path.join(LOCAL_MODELS_PATH, os.path.basename(latest_blob.name))
+        latest_model_path_to_save = os.path.join(DOCKER_MODEL_PATH, os.path.basename(latest_blob.name))
 
         # Download the latest model from GCS
         latest_blob.download_to_filename(latest_model_path_to_save)
@@ -204,7 +183,7 @@ def load_preprocessor() -> Any:
             latest_blob = max(blobs, key=lambda x: x.updated)
 
             # Specify the path to save the downloaded preprocessor
-            latest_preprocessor_path_to_save = os.path.join(LOCAL_PREPROCESSORS_PATH, os.path.basename(latest_blob.name))
+            latest_preprocessor_path_to_save = os.path.join(DOCKER_PREPROCESSOR_PATH, os.path.basename(latest_blob.name))
 
             # Download the latest preprocessor from GCS
             latest_blob.download_to_filename(latest_preprocessor_path_to_save)

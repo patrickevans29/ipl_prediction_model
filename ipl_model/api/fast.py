@@ -24,33 +24,34 @@ def hello():
 def predict(
     Team1: str,
     Team2: str,
-    Team_1_batting_average: float,
-    Team_2_batting_average: float,
-    team_1_toss_winner: float,
-    Team1_points_against_avg: float,
-    Team2_points_against_avg: float,
-    Team1_MVP_average: float,
-    Team2_MVP_average: float,
+    Avg_Weighted_Score_diff: float,
+    batting_average_weighted_diff: float,
+    batting_strike_rate_weighted_diff,
+    bowling_average_diff: float,
+    bowling_economy_rate_diff: float,
+    win_ratio_diff: float,
     Venue: str,
-    MatchImportance: float,
-    TossDecision: str
-):
+    City: str,
+    TossWinner: float,
+    TossDecision: str):
+
     '''
     Makes a prediction as to whether Team1 will win or not using the pred()
     function from main.py
     '''
+
     user_input_data = {
         'Team1': [Team1],
         'Team2': [Team2],
-        'Team_1_batting_average': [Team_1_batting_average],
-        'Team_2_batting_average': [Team_2_batting_average],
-        'team_1_toss_winner': [team_1_toss_winner],
-        'Team1_points_against_avg': [Team1_points_against_avg],
-        'Team2_points_against_avg': [Team2_points_against_avg],
-        'Team1_MVP_average': [Team1_MVP_average],
-        'Team2_MVP_average': [Team2_MVP_average],
+        'Avg_Weighted_Score_diff': [Avg_Weighted_Score_diff],
+        'batting_average_weighted_diff': [batting_average_weighted_diff],
+        'batting_strike_rate_weighted_diff': [batting_strike_rate_weighted_diff],
+        'bowling_average_diff': [bowling_average_diff],
+        'bowling_economy_rate_diff': [bowling_economy_rate_diff],
+        'win_ratio_diff': [win_ratio_diff],
         'Venue': [Venue],
-        'MatchImportance': [MatchImportance],
+        'City': [City],
+        'TossWinner': [TossWinner],
         'TossDecision': [TossDecision]
     }
 
