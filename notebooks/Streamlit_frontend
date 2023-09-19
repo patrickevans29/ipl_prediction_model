@@ -1,0 +1,85 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4988b05b-8356-42eb-9c73-267a07cbc523",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import streamlit as st\n",
+    "import pandas as pd\n",
+    "import requests\n",
+    "\n",
+    "st.subheader('Choose Teams and Venue')\n",
+    "home_team = st.selectbox('Select Home Team', team_names)\n",
+    "away_team = st.selectbox('Select Away Team', team_names)\n",
+    "home_toss_winner = st.radio(\"who win the toss?\", [home_team, away_team])\n",
+    "venue = st.selectbox('Venue', venues)\n",
+    "match_importance = st.radio(\"How important is the match?\", [1, 2, 3])\n",
+    "toss_decision = st.selectbox(\"What was the Toss Decision?\", [\"bat\", \"bowl\"])\n",
+    "\n",
+    "home_team_stats = df(df['Team1'] == home_team).iloc[0]\n",
+    "away_team_stats = df(df['Team2'] == away_team).iloc[0]\n",
+    "\n",
+    "# without showing values\n",
+    "home_batting_average = home_team_stats['Team_1_batting_average']\n",
+    "home_points_against_avg = home_team_stats['Team1_points_against_avg']\n",
+    "home_mvp_average = home_team_stats['Team1_MVP_average']\n",
+    "\n",
+    "away_batting_average = away_team_stats['Team_2_batting_average']\n",
+    "away_points_against_avg = away_team_stats['Team2_points_against_avg']\n",
+    "away_mvp_average = away_team_stats['Team2_MVP_average']\n",
+    "\n",
+    "\n",
+    "if st.button('Predict Winner'):\n",
+    "    \n",
+    "    user_input_data = {\n",
+    "        'Team1': [home_team],\n",
+    "        'Team2': [away_team],\n",
+    "        'Team_1_batting_average': [home_batting_average],\n",
+    "        'Team_2_batting_average': [away_batting_average],\n",
+    "        'Team_1_toss_winner': [home_toss_winner],\n",
+    "        'Team1_points_against_avg': [home_points_against_avg],\n",
+    "        'Team2_points_against_avg': [away_points_against_avg],\n",
+    "        'Team1_MVP_average': [home_mvp_average],\n",
+    "        'Team2_MVP_average': [away_mvp_average],\n",
+    "        'Venue': [venue],\n",
+    "        'MatchImportance': [match_importance],\n",
+    "        'TossDecision': [toss_decision]\n",
+    "    }\n",
+    "\n",
+    "params = None # ADD CODE\n",
+    "\n",
+    "ipl_prediction_model_url = \"http://127.0.0.1:8000/predict\" # Running locally\n",
+    "response = requests.get(ipl_prediction_model_url, params=user_input_data)\n",
+    "prediction = response.json()\n",
+    "\n",
+    "# Call the make the prediction\n",
+    "if st.button('Predict Winner'):\n",
+    "    st.write(f'Predicted Winner: {prediction}')"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
