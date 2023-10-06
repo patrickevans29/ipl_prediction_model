@@ -1,4 +1,4 @@
-**This model was created as part of Project Week for the Le Wagon Data Science Bootcamp, batch number 1341. **
+**This model was created as part of Project Week for the Le Wagon Data Science Bootcamp, batch number 1341.**
 
 The model makes a prediction as to whether a team will win an Indian Premier League cricket match. 
 
